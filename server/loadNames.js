@@ -13,42 +13,54 @@ var db = new sqlite3.Database(dbFileName);
 
 var questionComma = "?,"
 
+let numPhotos = 6;
 let globalCounter = 0;
+
 imageJson.forEach( function(image){   // run through the imageJson files, adds them into table
-    loadNames(image.url);
+    getSize(globalCounter, image.url, sizeCb);
 });
 
-function loadNames(image){
-    var idNum = globalCounter;
-    var fileName = image;
+function getSize(ind, name, cbFun) {
+    // var imgURL = imgServerURL+name;  // This is for the later shit.
+    // var options = url.parse(imgURL);
+    var options = url.parse(name);    // This is for the time-being development
 
-    var options = url.parse(image);
     http.get(options, function (response) {
-      var chunks = [];
-      response.on('data', function (chunk) {
-        chunks.push(chunk);
-      }).on('end', function() {
-        var buffer = Buffer.concat(chunks);
-        console.log(sizeOf(buffer).height);
-      });
+	var chunks = [];
+	response.on('data', function (chunk) {
+	    chunks.push(chunk);
+	}).on('end', function() {
+	    var buffer = Buffer.concat(chunks);
+	    dimensions = sizeOf(buffer);
+	    cbFun(ind, name, dimensions.width, dimensions.height);
     });
-    /*
-    var placeHolder = '('+idNum+questionComma+fileName+questionComma+dimension.width+questionComma+dimension.height+questionComma+questionComma+'?)';
-    var sql = 'INSERT INTO photoTags(idNum, fileName, width, height, locTag, tags) VALUES'+placeHolder;
+   });
+}
 
-    db.run(sql, function(err) {            // insert shit
+function sizeCb(ind, name, width, height){
+    var values = [globalCounter,name,width,height,'',''];
+    var sql = 'INSERT INTO photoTags(idNum, fileName, width, height, locTag, tags) VALUES(?,?,?,?,?,?)';
+    db.run(sql, values, function(err) {            // insert shit
        if (err) {
          return console.log(err.message);
        }
        console.log(`A row has been inserted with rowid ${this.lastID}`);
+       dbCb();
      });
-     */
 }
- // close the database connection
-db.close();
 
+function dbCb(){
+    globalCounter++;
+    //console.log("dbCB:"+globalCounter);
+    if(globalCounter == numPhotos){
+        dumpDB();
+        db.close();
+    }
+}
 
-/*
-    read imageJson
-    For each imageJson, run db.run
-*/
+function dumpDB() {
+  db.all ( 'SELECT * FROM photoTags', dataCallback);
+      function dataCallback( err, data ) {
+		console.log(data)
+      }
+}
