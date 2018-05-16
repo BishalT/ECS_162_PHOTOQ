@@ -13,6 +13,7 @@ var sql = "SELECT * FROM photoTags WHERE rowid IN ";
 
 let dbFileName = "PhotoQ.db";
 var db = new sqlite3.Database(dbFileName);
+var numPhotos = 980;
 
 
 function handler (request, response) {
@@ -28,34 +29,29 @@ function handler (request, response) {
 
 function queryImgHandler(request, response) {
     var req = url.parse(request.url, true);
+
+    if(!req.query.numList) return badQuery(response, "Missing Parameter: numList"); // if its just "query?..." then it returns, failure.
+    if(!(checkNum(req.query.numList))) return badQuery(response, "Numbers not in range.");
+
     var indicies = '(' + req.query.numList.split(" ").join(",") + ')';
 
     var responseObject = [];
     var sqlCmd = sql + indicies;
 
-    db.each(sqlCmd, function(err, data){
-        if(err) console.err("YA FUCKED UP");
-        responseObject.push({
-            src: imgURLBase+data.fileName,
-            width: data.width,
-            height: data.height,
+    db.each(sqlCmd,                     // For every valid row that you want
+        function(err, data){            // 1st callback which adds information to the responseObject
+            if(err) console.err("YA FUCKED UP");
+            responseObject.push({
+                src: imgURLBase+data.fileName,
+                width: data.width,
+                height: data.height,
+            });
+        },
+        function(err){           // 2nd call back which writes the responseObject as a JSON
+            response.writeHead(200,{"Content-Type":"text/html"});
+            response.write(JSON.stringify(responseObject));
+            response.end();
         });
-        console.log(responseObject);
-    });
-
-    /*
-    var queryNum = url.substring(url.indexOf("=") + 1, url.length);
-    if(queryNum && queryNum >= 0 && queryNum <= 989){
-        response.writeHead(200, {"Content-Type": "text/html"});
-        response.write(imgURLBase+imgList[queryNum]);
-        response.end();
-    }
-    else{
-        response.writeHead(400, {"Content-Type": "text/html"});
-        response.write("<p>Bad Request</p>");
-        response.end();
-    }
-    */
 }
 
 function staticHandler(request, response){
@@ -69,6 +65,24 @@ function staticHandler(request, response){
       });
   }).resume();
 }
+
+function badQuery(response, badString){
+    response.writeHead(400, {"Content-Type": "text/html"});
+    response.write("<p>"+badString+"</p>");
+    response.end();
+}
+
+function checkNum(element){
+    console.log(typeof element);
+    console.log(element.length);
+    console.log();
+    for(var i = 0; i < element.length; i++){
+        console.log(element[i]);
+        if (element[i] < 0 || element[i] > numPhotos) return false;
+    }
+    return true;
+}
+
 
 var server = http.createServer(handler);
 var fileServer = new static.Server('./public');
