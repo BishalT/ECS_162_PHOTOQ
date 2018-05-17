@@ -2,10 +2,10 @@ var url = require('url');
 var http = require('http');
 var sqlite3 = require("sqlite3").verbose();  // use sqlite
 var fs = require("fs");                      // use file-system library
-//var imageJson = require('./6whs.json');
-var imageJson = JSON.parse(fs.readFileSync("photoList.json")).photoURLs;
 var sizeOf = require('image-size');           //
 
+//var imageJson = require('./6whs.json');
+var imageJson = JSON.parse(fs.readFileSync("photoList.json")).photoURLs;
 
 http.globalAgent.maxSockets = 1;
 
@@ -25,13 +25,12 @@ for(var index = 0; index < imageJson.length; index++){
     getSize(index, imageJson[index], sizeCB);
 }
 
+
 function getSize(ind, name, cbFun) {
-    //console.log("getSize (Id):"+ind);
+    console.log("getSize (Id):"+ind);
      var imgURL = imgServerURL + name;  // This is for the later shit.
      var options = url.parse(imgURL);
-
     //var options = url.parse(name);    // This is for the time-being development
-
     http.get(options, function (response) {
     	var chunks = [];
     	response.on('data', function (chunk) {
@@ -47,7 +46,6 @@ function getSize(ind, name, cbFun) {
        console.log(imgURL);
        console.log(options);
        console.error('Error with the request:', err.message);
-       //console.error('Error with the request:', err);
    });
 }
 
@@ -62,6 +60,7 @@ function sizeCB(ind, name, width, height){
        dbCB();
      });
 }
+
 
 function dbCB(){
     globalCounter++;

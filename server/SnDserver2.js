@@ -13,7 +13,9 @@ var sql = "SELECT * FROM photoTags WHERE rowid IN ";
 
 let dbFileName = "PhotoQ.db";
 var db = new sqlite3.Database(dbFileName);
-var numPhotos = 980;
+
+var imgList = JSON.parse(fs.readFileSync("photoList.json")).photoURLs;
+var numPhotos = imgList.length;
 
 
 function handler (request, response) {
@@ -31,7 +33,7 @@ function queryImgHandler(request, response) {
     var req = url.parse(request.url, true);
 
     if(!req.query.numList) return badQuery(response, "Missing Parameter: numList"); // if its just "query?..." then it returns, failure.
-    if(!(checkNum(req.query.numList))) return badQuery(response, "Numbers not in range.");
+    if(!(checkNum(req.query.numList))) return badQuery(response, "Numbers not in range.");  // if the nums arent in range
 
     var indicies = '(' + req.query.numList.split(" ").join(",") + ')';
 
@@ -56,7 +58,6 @@ function queryImgHandler(request, response) {
 
 function staticHandler(request, response){
     var url = request.url.replace("/","");
-    //console.log(url);
     request.addListener('end', function() {
       fileServer.serve(request,response, function(error, result) {
         if(error) { // if there is no static file for it to access.
@@ -73,14 +74,11 @@ function badQuery(response, badString){
 }
 
 function checkNum(element){
-    console.log(typeof element);
-    console.log(element.length);
-    console.log();
+    var false_count = 0;
     for(var i = 0; i < element.length; i++){
-        console.log(element[i]);
-        if (element[i] < 0 || element[i] > numPhotos) return false;
+        if (element[i] < 0 || element[i] > numPhotos) false_count++;
     }
-    return true;
+    return (false_count == 0);
 }
 
 
