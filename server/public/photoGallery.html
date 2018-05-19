@@ -5,18 +5,32 @@
     <meta name="viewport" content="width=device-width">
     <meta http-equiv="Cache-control" content="no-cache">
     <title>Image Gallery Example</title>
+    <link href="https://fonts.googleapis.com/css?family=Poppins:400,700i" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="reset.css">
-    <link rel="stylesheet" type="text/css" href="photoGallery.css">
-  </head>
+    <link rel="stylesheet" type="text/css" href="photoGallery.css"> 
+    <link href="https://fonts.googleapis.com/css?family=Poppins:700" rel="stylesheet">
+    
+</head>
   <body>
-
-    <h2>PhotoQ</h2><input type="text" placeholder="34 882 754 760 708 687" id="req-text"/><button type="button" onClick="updateImages();">Go!</button>
+<header>
+<div class="mainsearch">
+      <div class="title">
+          <h2>PhotoQ</h2>
+       </div>
+    <div class="search">
+    <input id="search2" type="text" id="req-text"/><button type="button" onClick="updateImages();">Go!</button>
+    </div>
+    </div>
+</header>  
+<main>
     <div id="react"></div>
+       
     
     <script src="https://unpkg.com/react@15/dist/react.js"></script>
     <script src="https://unpkg.com/react-dom@15/dist/react-dom.js"></script>
     <script src="prop-types.js"></script>
     <script src="react-photo-gallery.js"></script>
     <script src="photoGallery.js"></script>
-  </body>
+ </main>
+    </body>
 </html>

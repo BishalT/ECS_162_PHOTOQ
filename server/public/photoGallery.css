@@ -1,15 +1,61 @@
 /* title */
+html, body {
+    margin-right: -15px;
+    margin-left: -15px;
+    padding: 0;
+}
+
+.mainsearch {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+input {
+    height: 40px;
+    width: 45vw;
+}
+
+button {
+    height: 43px;
+    
+}
+
+.title {
+    padding-left: 25px;
+}
+
+
+
 h2 {
-   font-family: sans-serif;
-   font-size: xx-large;
-   text-align: left;
+   font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+   font-size: 40px;
+    font-size: 3.0em;
+   text-align: center;
    margin: 10px;
-   color: #999;
+    color: rgba(60,84,127,1);
+   text-transform: uppercase;
+    font-style: italic;
+}
+
+header {
+    padding-bottom: 5vh;
+}
+
+main {
+    background-color: rgba(0,0,0,0.1);
 }
 
 body {
      margin: 15px;
+    color: blue;
 }
+
+input {
+    display: inline-block;
+}
+
 
 div.selectedControls {
 		     display: block;
@@ -44,6 +90,7 @@ p.tagText {
 
 img {
     display: block;
+    padding: 15px;
 }
 
 /* so far nothing special when image selected */

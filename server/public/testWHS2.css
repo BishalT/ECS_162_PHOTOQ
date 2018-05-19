@@ -2,10 +2,10 @@ body {
 	min-height: 100vh;  /* need this line to
 					tell body to fill viewport */
 	font-family: 'Montserrat', sans-serif;
-	background-color: white;
+	background-color: black;
 	display: flex;
 	flex-direction: column;
-	color: blue;
+	color: black;
      }
 
 header {
