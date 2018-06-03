@@ -1,16 +1,10 @@
 
-/* This array is just for testing purposes.  You will need to 
+/* This array is just for testing purposes.  You will need to
    get the real image data using an AJAX query. */
 
-var photos = [
-{src: "http://lotus.idav.ucdavis.edu/public/ecs162/UNESCO/A%20Torre%20Manuelina.jpg", width: 574, height: 381 },
-{src: "http://lotus.idav.ucdavis.edu/public/ecs162/UNESCO/Uluru%20sunset1141.jpg", width: 500 , height: 334 },
-{src: "http://lotus.idav.ucdavis.edu/public/ecs162/UNESCO/Sejong tomb 1.jpg", width: 574, height: 430},
-{src: "http://lotus.idav.ucdavis.edu/public/ecs162/UNESCO/Serra%20da%20Capivara%20-%20Painting%207.JPG", width: 574, height: 430},
-{src: "http://lotus.idav.ucdavis.edu/public/ecs162/UNESCO/Royal%20Palace%2c%20Rabat.jpg", width: 574, height: 410},
-{src: "http://lotus.idav.ucdavis.edu/public/ecs162/UNESCO/Red%20pencil%20urchin%20-%20Papahnaumokukea.jpg", width: 574 , height: 382 }
-];
-
+   const photos = [
+   {src: "", height:0, width:0}
+   ];
 
 
 // A react component for a tag
@@ -35,8 +29,8 @@ class TileControl extends React.Component {
 	var photoName = _src.split("/").pop();
 	photoName = photoName.split('%20').join(' ');
 
-        return ( React.createElement('div', 
- 	 {className: _selected ? 'selectedControls' : 'normalControls'},  
+        return ( React.createElement('div',
+ 	 {className: _selected ? 'selectedControls' : 'normalControls'},
          // div contents - so far only one tag
               React.createElement(Tag,
 		 { text: photoName })
@@ -57,24 +51,24 @@ class ImageTile extends React.Component {
 	var _selected = _photo.selected; // this one is just for readability
 
 	return (
-	    React.createElement('div', 
+	    React.createElement('div',
 	        {style: {margin: this.props.margin, width: _photo.width},
 			 className: 'tile',
                          onClick: function onClick(e) {
 			    console.log("tile onclick");
 			    // call Gallery's onclick
-			    return _onClick (e, 
-					     { index: _index, photo: _photo }) 
+			    return _onClick (e,
+					     { index: _index, photo: _photo })
 				}
 		 }, // end of props of div
 		 // contents of div - the Controls and an Image
 		React.createElement(TileControl,
-		    {selected: _selected, 
+		    {selected: _selected,
 		     src: _photo.src}),
 		React.createElement('img',
-		    {className: _selected ? 'selected' : 'normal', 
-                     src: _photo.src, 
-		     width: _photo.width, 
+		    {className: _selected ? 'selected' : 'normal',
+                     src: _photo.src,
+		     width: _photo.width,
                      height: _photo.height
 			    })
 				)//createElement div
@@ -103,7 +97,7 @@ class App extends React.Component {
   render() {
     return (
        React.createElement( Gallery, {photos: this.state.photos,
-       onClick: this.selectTile, 
+       onClick: this.selectTile,
        ImageComponent: ImageTile} )
       );
   }
@@ -135,12 +129,3 @@ function updateImages()
   } );
   xhr.send();
 }
-
-
-
-
-
-
-
-
-

@@ -86,25 +86,3 @@ var server = http.createServer(handler);
 var fileServer = new static.Server('./public');
 //server.listen(serverPort);
 server.listen(localPort, '127.0.0.1');
-
-
-//var imgList = [];
-//loadImageList();
-/*
-function loadImageList () {
-    var data = fs.readFileSync('photoList.json');
-    if (! data) {
-	    console.log("cannot read photoList.json");
-    } else {
-	    listObj = JSON.parse(data);
-	    imgList = listObj.photoURLs;
-    }
-}
-
-function dumpDB() {
-  db.all( 'SELECT * FROM photoTags WHERE rowid IN (1, 2)', dataCallback);           // get the specific rows
-      function dataCallback( err, data ) {
-		console.log(data)
-      }
-}
-*/
