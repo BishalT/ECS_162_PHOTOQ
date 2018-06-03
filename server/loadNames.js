@@ -11,7 +11,7 @@ http.globalAgent.maxSockets = 1;
 
 let dbFileName = "PhotoQ.db";
 var imgServerURL = 'http://lotus.idav.ucdavis.edu/public/ecs162/UNESCO/'
-var sql = 'INSERT INTO photoTags(idNum, fileName, width, height, locTag, tags) VALUES(?,?,?,?,?,?)';
+var sql = 'INSERT INTO photoTags(idNum, fileName, width, height, landmark, tags) VALUES(?,?,?,?,?,?)';
 // makes the object that represents the database in our code
 var db = new sqlite3.Database(dbFileName);
 

@@ -1,11 +1,18 @@
 var APIkey = "AIzaSyB9raQ8TQ_j2seve_HcSZLZM4PJ9zbcDsk";
 var APIrequest = require('request');
-var imageJson = require('./6whs.json');
+//var imageJson = require('./6whs.json');
 
+var fs = require("fs");                      // use file-system library
+var sqlite3 = require("sqlite3").verbose();  // use sqlite
+var imageJson = JSON.parse(fs.readFileSync("photoList.json")).photoURLs;
+let dbFileName = "PhotoQ.db";
+var db = new sqlite3.Database(dbFileName);
+
+var sqlCMD = "UPDATE photoTags SET landmark = ?, tags = ? WHERE idNum = ?";
+var urlBase = "http://lotus.idav.ucdavis.edu/public/ecs162/UNESCO/"
 // An object containing the data the CCV API wants
 // Will get stringified and put into the body of an HTTP request, below
-APIrequestObject = {
-"requests": [
+APIrequestObject = {"requests": [
     {
       "image":
       {
@@ -22,15 +29,21 @@ APIrequestObject = {
   ]
 }
 
-url = 'https://vision.googleapis.com/v1/images:annotate?key='+APIkey;
+var url = 'https://vision.googleapis.com/v1/images:annotate?key='+APIkey;
+var MAX_NUM_TAGS = 6;
+var MAX_NUM_PHOTOS = 30;
 
-imageJson.forEach( function(image){   // run through the imageJson files, annotate them
-  annotateImage(image);
-});
+
+// for(var index = 0; index < 30; index++){
+//     console.log(imageJson[index]);
+//     annotateImage(imageJson[index], index);
+// }
+
+annotateImage(imageJson[0], 0);
 
 // function to send off request to the API
-function annotateImage(image) {
-  APIrequestObject.requests[0].image.source.imageUri = image.url;
+function annotateImage(image, index) {
+  APIrequestObject.requests[0].image.source.imageUri = urlBase+image;
   APIrequest(
     {
       url: url,
@@ -48,11 +61,43 @@ function annotateImage(image) {
       console.log(body);
     } else {
       APIresponseJSON = body.responses[0];
-      console.log(APIresponseJSON);
-      if(APIresponseJSON.landmarkAnnotations){   // sometimes Undefined
-        console.log(APIresponseJSON.landmarkAnnotations[0].locations);
+      updateDB(APIresponseJSON, index);
+      if( index + 1 > MAX_NUM_PHOTOS){
+          process.exit(0);
       }
+      annotateImage(imageJson[index+1], index+1)
       console.log('\n');
     }
   } // end callback function
 } // end annotateImage
+
+
+function updateDB(APIresponseJSON, index){
+    console.log(APIresponseJSON);
+    console.log("UpdateDB index: " + index);
+    var tagList = "";
+    var landmarkTag ="";
+    if(APIresponseJSON.labelAnnotations) {
+        for(var i = 0; i < MAX_NUM_TAGS; i++){
+            var tag = APIresponseJSON.labelAnnotations[i].description;
+
+            if(!APIresponseJSON.labelAnnotations[i+1].description || i == MAX_NUM_TAGS - 1 ){     // if the next tag doesnt exist, then we can stop
+                tagList = tagList + tag;
+                break;
+            }
+            else{                               // still need more tags
+                tagList = tagList + tag + ",";  // tagList = "" + "tag1" + ","
+            }
+        }
+    }
+
+    if(APIresponseJSON.landmarkAnnotations){   // if landmark tag exist, then throw it in
+        langmarkTag = APIresponseJSON.landmarkAnnotations[0].description
+    }
+
+    db.run(sqlCMD, landmarkTag, tagList, index);
+
+    function dataCallback( err, data ) {
+      console.log(err)
+    }
+}
