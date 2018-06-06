@@ -8,8 +8,11 @@ var url = require('url');
 var sqlite3 = require('sqlite3');
 
 var queryString = "query";
+var delString = "delTag"
 var imgURLBase = "http://lotus.idav.ucdavis.edu/public/ecs162/UNESCO/";
 var sql = "SELECT * FROM photoTags WHERE ";
+var sqlTag = "SELECT * FROM photoTags WHERE idNum IN (";
+var sqlUpdate = "UPDATE photoTags SET tags = ? WHERE idNum = ?";
 
 let dbFileName = "PhotoQ.db";
 var db = new sqlite3.Database(dbFileName);
@@ -19,7 +22,10 @@ var numPhotos = imgList.length;
 
 
 function handler (request, response) {
-    if(request.url.indexOf(queryString) >= 0){
+    if(request.url.indexOf(delString) >= 0){
+        deleteTagHandler(request);
+    }
+    else if(request.url.indexOf(queryString) >= 0){
         queryImgHandler(request,response);
         //console.log("DYNAM");
     }
@@ -27,6 +33,21 @@ function handler (request, response) {
         staticHandler(request,response);
         //console.log("STAT");
     }
+}
+
+function deleteTagHandler(request){
+    var req = url.parse(request.url,true);
+    var decoded_req = decodeURI(req.search.replace("?delTag=", "")).split("+");
+    var sqlCmd = sqlTag + decoded_req[0] + ')';
+    console.log(sqlCmd);
+    db.each(sqlCmd,
+        function(error, data){
+            if(error) console.log(error);
+            var split = data.tags.split(",");
+            split.splice(split.indexOf(decoded_req[1]), 1);
+            var join = split.join(",");
+            db.run(sqlUpdate, join, decoded_req[0]);
+        })
 }
 
 function queryImgHandler(request, response) {

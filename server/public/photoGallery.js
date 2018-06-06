@@ -6,6 +6,14 @@ const photos = [
   {src: "", height:0, width:0, landmark:"", tags:[]}
 ];
 
+function deleteTagServer(idNum, tag){
+    var xhr = new XMLHttpRequest();
+    var reqQuery = idNum +","+tag;
+    console.log(reqQuery);
+    xhr.open("GET", "/query?delTag=" + encodeURI(reqQuery).replace(/ |,/g, "+"));
+    xhr.send();
+}
+
 
 // A react component for a tag
 class Tag extends React.Component {
@@ -27,9 +35,9 @@ class TileControl extends React.Component {
 
     deleteTag(index, event){
         event.stopPropagation();
-        this.state.tags.splice(index,1);
+        var delTag = this.state.tags.splice(index,1);
         this.setState({tags: this.state.tags});
-        console.log(this.state);
+        deleteTagServer(this.props.IdNum, delTag);
         console.log("tag onclick");
     }
 
