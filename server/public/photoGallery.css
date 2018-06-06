@@ -18,7 +18,7 @@ input {
 
 button {
     height: 43px;
-    
+
 }
 
 .title {
@@ -58,7 +58,8 @@ input {
 
 
 div.selectedControls {
-		     display: block;
+		     display: flex;
+             flex-direction: row;
 }
 
 div.normalControls {
@@ -69,16 +70,15 @@ div.normalControls {
 div.tile {
     backgroundColor: #eee;
     cursor: pointer;
-    overflow: hidden; 
+    overflow: hidden;
     float: left;
     position: relative;
 }
 
 /* Tag styling */
 p.tagText {
-   left: 4px; 
-   top: 4px; 
-   position: absolute; 
+   left: 4px;
+   top: 4px;
    zIndex: 2;
    background-color: blue;
    padding: 5px;
@@ -99,4 +99,3 @@ img.normal {
 
 img.selected {
 }
-

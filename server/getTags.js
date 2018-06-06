@@ -8,7 +8,7 @@ var imageJson = JSON.parse(fs.readFileSync("photoList.json")).photoURLs;
 let dbFileName = "PhotoQ.db";
 var db = new sqlite3.Database(dbFileName);
 
-var sqlCMD = "UPDATE photoTags SET landmark = ?, tags = ? WHERE idNum = ?";
+var sqlCMD = "UPDATE photoTags SET location = ?, tags = ? WHERE idNum = ?";
 var urlBase = "http://lotus.idav.ucdavis.edu/public/ecs162/UNESCO/"
 // An object containing the data the CCV API wants
 // Will get stringified and put into the body of an HTTP request, below
@@ -31,7 +31,7 @@ APIrequestObject = {"requests": [
 
 var url = 'https://vision.googleapis.com/v1/images:annotate?key='+APIkey;
 var MAX_NUM_TAGS = 6;
-var MAX_NUM_PHOTOS = 30;
+var MAX_NUM_PHOTOS = imageJson.length;
 
 
 // for(var index = 0; index < 30; index++){
@@ -73,15 +73,15 @@ function annotateImage(image, index) {
 
 
 function updateDB(APIresponseJSON, index){
-    console.log(APIresponseJSON);
+    // console.log(APIresponseJSON);
     console.log("UpdateDB index: " + index);
     var tagList = "";
-    var landmarkTag ="";
+    var locationTag ="";
     if(APIresponseJSON.labelAnnotations) {
         for(var i = 0; i < MAX_NUM_TAGS; i++){
             var tag = APIresponseJSON.labelAnnotations[i].description;
 
-            if(!APIresponseJSON.labelAnnotations[i+1].description || i == MAX_NUM_TAGS - 1 ){     // if the next tag doesnt exist, then we can stop
+            if(!APIresponseJSON.labelAnnotations[i+1] || i == MAX_NUM_TAGS - 1 ){     // if the next tag doesnt exist, then we can stop
                 tagList = tagList + tag;
                 break;
             }
@@ -92,10 +92,10 @@ function updateDB(APIresponseJSON, index){
     }
 
     if(APIresponseJSON.landmarkAnnotations){   // if landmark tag exist, then throw it in
-        langmarkTag = APIresponseJSON.landmarkAnnotations[0].description
+        locationTag = APIresponseJSON.landmarkAnnotations[0].description
     }
 
-    db.run(sqlCMD, landmarkTag, tagList, index);
+    db.run(sqlCMD, locationTag, tagList, index);
 
     function dataCallback( err, data ) {
       console.log(err)

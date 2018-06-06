@@ -11,7 +11,7 @@ http.globalAgent.maxSockets = 1;
 
 let dbFileName = "PhotoQ.db";
 var imgServerURL = 'http://lotus.idav.ucdavis.edu/public/ecs162/UNESCO/'
-var sql = 'INSERT INTO photoTags(idNum, fileName, width, height, landmark, tags) VALUES(?,?,?,?,?,?)';
+var sql = 'INSERT INTO photoTags(idNum, fileName, width, height, location, tags) VALUES(?,?,?,?,?,?)';
 // makes the object that represents the database in our code
 var db = new sqlite3.Database(dbFileName);
 
@@ -22,7 +22,7 @@ let globalCounter = 0;
 
 for(var index = 0; index < imageJson.length; index++){
     //console.log(imageJson[index]);
-    getSize(index, imageJson[index], sizeCB);
+    getSize(index, encodeURIComponent(imageJson[index]), sizeCB);
 }
 
 
@@ -66,14 +66,14 @@ function dbCB(){
     globalCounter++;
     console.log("dbCB (GLOBAL):"+globalCounter);
     if(globalCounter == imageJson.length){
-        dumpDB();
+        // dumpDB();
         db.close();
     }
 }
 
-function dumpDB() {
-  db.all( 'SELECT * FROM photoTags WHERE rowid IN (1, 2)', dataCallback);           // get the specific rows
-      function dataCallback( err, data ) {
-		console.log(data)
-      }
-}
+// function dumpDB() {
+//   db.all( 'SELECT * FROM photoTags WHERE rowid IN (1, 2)', dataCallback);           // get the specific rows
+//       function dataCallback( err, data ) {
+// 		console.log(data)
+//       }
+// }

@@ -19,7 +19,7 @@ var db = new sqlite3.Database(dbFileName);
 // Initialize table.
 // If the table already exists, causes an error.
 // Fix the error by removing or renaming PhotoQ.db
-var cmdStr = "CREATE TABLE photoTags ( idNum INTEGER UNIQUE NOT NULL PRIMARY KEY, fileName TEXT, width INTEGER, height INTEGER, landmark TEXT, tags TEXT)"
+var cmdStr = "CREATE TABLE photoTags ( idNum INTEGER UNIQUE NOT NULL PRIMARY KEY, fileName TEXT, width INTEGER, height INTEGER, location TEXT, tags TEXT)"
 db.run(cmdStr,tableCreationCallback);
 
 // Always use the callback for database operations and print out any

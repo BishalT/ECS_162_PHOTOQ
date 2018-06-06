@@ -2,9 +2,9 @@
 /* This array is just for testing purposes.  You will need to
    get the real image data using an AJAX query. */
 
-   const photos = [
-   {src: "", height:0, width:0}
-   ];
+const photos = [
+  {src: "", height:0, width:0, landmark:"", tags:[]}
+];
 
 
 // A react component for a tag
@@ -13,43 +13,70 @@ class Tag extends React.Component {
     render () {
 	return React.createElement('p',  // type
 	    { className: 'tagText'}, // properties
-	   this.props.text);  // contents
+	       this.props.tag);  // contents
     }
 };
 
 
 // A react component for controls on an image tile
 class TileControl extends React.Component {
+    constructor(props) {
+      super(props);
+      this.state = { tags: props.Tags };
+    }
+
+    deleteTag(index, event){
+        event.stopPropagation();
+        this.state.tags.splice(index,1);
+        this.setState({tags: this.state.tags});
+        console.log(this.state);
+        console.log("tag onclick");
+    }
 
     render () {
-	// remember input vars in closure
+        // remember input vars in closure
         var _selected = this.props.selected;
         var _src = this.props.src;
-        // parse image src for photo name
-	var photoName = _src.split("/").pop();
-	photoName = photoName.split('%20').join(' ');
+        var _tags = this.props.Tags;
 
-        return ( React.createElement('div',
- 	 {className: _selected ? 'selectedControls' : 'normalControls'},
-         // div contents - so far only one tag
-              React.createElement(Tag,
-		 { text: photoName })
-	    )// createElement div
-	)// return
-    } // render
+        var tagList = [];
+        tagList.push( 'div' );
+        tagList.push( { className: _selected ? 'selectedControls' : 'normalControls'} )
+
+        for (var index = 0; index < _tags.length; index++){
+            tagList.push(
+                React.createElement('div',
+        	        {  className: _tags[index],
+                        onClick: this.deleteTag.bind(this, index)},
+
+                React.createElement(Tag, {tag: _tags[index], key:_tags[index] + index})
+            ));
+        }
+
+        return ( React.createElement.apply(null, tagList) );
+
+        // div contents - so far only one tag
+        // return (
+        //     React.createElement('div',
+    	//           {className: _selected ? 'selectedControls' : 'normalControls'},
+        //       React.createElement(Tag,
+    	//                 {
+        //                     tag: _tags[0],
+        //                 })
+        //             )// createElement div
+        //         )// return
+             } // render
 };
 
 
 // A react component for an image tile
 class ImageTile extends React.Component {
-
     render() {
 	// onClick function needs to remember these as a closure
 	var _onClick = this.props.onClick;
 	var _index = this.props.index;
 	var _photo = this.props.photo;
 	var _selected = _photo.selected; // this one is just for readability
-
 	return (
 	    React.createElement('div',
 	        {style: {margin: this.props.margin, width: _photo.width},
@@ -64,11 +91,14 @@ class ImageTile extends React.Component {
 		 // contents of div - the Controls and an Image
 		React.createElement(TileControl,
 		    {selected: _selected,
-		     src: _photo.src}),
+		     src: _photo.src,
+             Landmark: _photo.landmark,
+             IdNum: _photo.idNum,
+             Tags: _photo.tags}),
 		React.createElement('img',
 		    {className: _selected ? 'selected' : 'normal',
                      src: _photo.src,
-		     width: _photo.width,
+		             width: _photo.width,
                      height: _photo.height
 			    })
 				)//createElement div
@@ -80,7 +110,6 @@ class ImageTile extends React.Component {
 // The react component for the whole image gallery
 // Most of the code for this is in the included library
 class App extends React.Component {
-
   constructor(props) {
     super(props);
     this.state = { photos: photos };
@@ -96,9 +125,12 @@ class App extends React.Component {
 
   render() {
     return (
-       React.createElement( Gallery, {photos: this.state.photos,
-       onClick: this.selectTile,
-       ImageComponent: ImageTile} )
+       React.createElement( Gallery,
+           {
+               photos: this.state.photos,
+               onClick: this.selectTile,
+               ImageComponent: ImageTile
+           })
       );
   }
 }
@@ -118,7 +150,8 @@ function updateImages()
   if (!reqIndices) return; // No query? Do nothing!
 
   var xhr = new XMLHttpRequest();
-  xhr.open("GET", "/query?numList=" + reqIndices.replace(/ |,/g, "+")); // We want more input sanitization than this!
+
+  xhr.open("GET", "/query?keyList=" + encodeURI(reqIndices).replace(/ |,/g, "+"));
   xhr.addEventListener("load", (evt) => {
     if (xhr.status == 200) {
         reactApp.setState({photos:JSON.parse(xhr.responseText)});
@@ -128,4 +161,8 @@ function updateImages()
     }
   } );
   xhr.send();
+}
+
+function tagOnclick (obj, e) {
+    console.log("obj");
 }
