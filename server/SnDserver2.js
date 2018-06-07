@@ -1,4 +1,4 @@
-var serverPort = 53491;
+var serverPort = 53419;
 var localPort = 8000;
 
 var http  = require('http');
@@ -7,6 +7,7 @@ var fs = require('fs');
 var url = require('url');
 var sqlite3 = require('sqlite3');
 
+var auto = require("./makeTagTable");
 var queryString = "query";
 var delString = "delTag"
 var imgURLBase = "http://lotus.idav.ucdavis.edu/public/ecs162/UNESCO/";
@@ -19,6 +20,15 @@ var db = new sqlite3.Database(dbFileName);
 
 var imgList = JSON.parse(fs.readFileSync("photoList.json")).photoURLs;
 var numPhotos = imgList.length;
+var tagTable = {};   // global
+
+auto.makeTagTable(tagTableCallback)
+
+
+function tagTableCallback(data) {
+   tagTable = data;
+}
+
 
 
 function handler (request, response) {
@@ -28,6 +38,8 @@ function handler (request, response) {
     else if(request.url.indexOf(queryString) >= 0){
         queryImgHandler(request,response);
         //console.log("DYNAM");
+    }else if(request.url.indexOf("autocomplete") >= 0) { 
+        queryTagHangler(request);
     }
     else{
         staticHandler(request,response);
@@ -125,5 +137,5 @@ function accumlateTags(tagList){
 
 var server = http.createServer(handler);
 var fileServer = new static.Server('./public');
-//server.listen(serverPort);
-server.listen(localPort, '127.0.0.1');
+server.listen(serverPort);
+//server.listen(localPort, '127.0.0.1');

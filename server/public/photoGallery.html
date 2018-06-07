@@ -18,7 +18,7 @@
           <h2>PhotoQ</h2>
        </div>
     <div class="search">
-    <input type="text" placeholder="34 882 754 760 708 687" id="req-text"/><button type="button" onClick="updateImages();">Go!</button>
+    <input type="text" onkeydown="tagTableCallback(data)" placeholder="34 882 754 760 708 687" id="req-text"/><button type="button" onClick="updateImages();">Go!</button>
     </div>
     </div>
 </header>
@@ -31,6 +31,44 @@
     <script src="prop-types.js"></script>
     <script src="react-photo-gallery.js"></script>
     <script src="photoGallery.js"></script>
+    <script src="makeTagTable.js"></script>
  </main>
     </body>
 </html>
+<script type="text/javascript">
+    var name_input = document.getElementById('req-text');
+    var xhttp = new XMLHttpRequest();
+    name_input.addEventListener("keyup", function(e) {
+        input_val = this.value;
+        console.log(input_val);
+        var min_characters = 2;
+        if (input_val.length < min_characters) {
+	        while(huge_list.hasChildNodes()) {
+                huge_list.removeChild(huge_list.lastChild);
+            }
+            return;
+        } else {
+            // why do we need this?
+            xhttp.abort();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    var response = JSON.parse( this.responseText );
+                    console.log(response);
+		    var huge_list = document.getElementById('huge_list');
+		    while(huge_list.hasChildNodes()) {
+		    	huge_list.removeChild(huge_list.lastChild);
+		    }
+		    response.forEach(function(item) {
+                    // Create a new <option> element.
+                    var option = document.createElement('option');
+                    option.value = item;
+		            huge_list.appendChild(option);
+                   })
+            	}
+	    }
+            xhttp.open("GET", "?q=" + input_val);
+            xhttp.send()
+    }
+ }
+)
+</script>

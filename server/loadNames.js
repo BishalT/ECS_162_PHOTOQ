@@ -3,6 +3,7 @@ var http = require('http');
 var sqlite3 = require("sqlite3").verbose();  // use sqlite
 var fs = require("fs");                      // use file-system library
 var sizeOf = require('image-size');           //
+var auto = require("./makeTagTable");
 
 //var imageJson = require('./6whs.json');
 var imageJson = JSON.parse(fs.readFileSync("photoList.json")).photoURLs;
@@ -70,6 +71,13 @@ function dbCB(){
         db.close();
     }
 }
+
+var tagTable = {};   // global
+auto.makeTagTable(tagTableCallback);
+function tagTableCallback(data) {
+   tagTable = data;
+}
+
 
 // function dumpDB() {
 //   db.all( 'SELECT * FROM photoTags WHERE rowid IN (1, 2)', dataCallback);           // get the specific rows
