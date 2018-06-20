@@ -1,4 +1,3 @@
-var APIkey = "AIzaSyB9raQ8TQ_j2seve_HcSZLZM4PJ9zbcDsk";
 var APIrequest = require('request');
 //var imageJson = require('./6whs.json');
 
